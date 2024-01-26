@@ -1,0 +1,53 @@
+---
+title: "make_art function"
+author: "Gorkem Atilla"
+date: "25/01/2024"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+# Set the CRAN mirror
+options(repos = c(CRAN = "https://cran.rstudio.com"))
+
+knitr::opts_chunk$set(echo = TRUE)
+install.packages("ggplot2")
+library(ggplot2)
+
+install.packages("RColorBrewer")
+library(RColorBrewer)
+```
+
+## R Markdown
+
+```{r}
+make_art <- function(seed = NULL) {
+  if (!is.null(seed)) {
+    set.seed(seed)
+  }
+  group <- 45
+  group_names <- paste("GA", 3:group, sep = "")
+  resim <- data.frame()
+  for (i in 1:45) {
+    group_data <- data.frame(Year = i, Group = sample(group_names, group, replace = TRUE),
+                             Value = prop.table(sample(c(rep(0, 100), 3:group), group)))
+    resim <- rbind(resim, group_data)
+  }
+  resim <- resim[order(resim$Year, resim$Group),]
+  palette <- colorRampPalette(brewer.pal(3, "Paired"))(group)
+  palette <- palette[sample(length(palette))]
+  ggplot(resim, aes(x = Year, y = Value, fill = Group)) + 
+    geom_area() +
+    theme_minimal() +
+    scale_fill_manual(values = palette) +
+    theme(
+      text = element_blank(),
+      line = element_blank(),
+      title = element_blank(),
+      panel.border = element_blank(),
+      panel.background = element_blank()
+    )
+}
+
+make_art_plot1 <- make_art()
+make_art_plot1
+```
